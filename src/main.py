@@ -1,11 +1,10 @@
 import os  
 import traffic_analysis
-import capture_traffic
 import pyshark
 import click
 
 
-def generate_plots(capture, traffic_graph_output_file,traffic_packets_histogram):
+def generate_plots_and_data(capture, traffic_graph_output_file,traffic_packets_histogram, traffic_packets_main_statistics):
     # Generate graph of traffic as a function of time
     if not os.path.exists(traffic_graph_output_file):
         print(f"Generating traffic graph: {traffic_graph_output_file}")
@@ -20,6 +19,14 @@ def generate_plots(capture, traffic_graph_output_file,traffic_packets_histogram)
     else:
         print(f"Traffic packets histogram already exists: {traffic_packets_histogram}")
 
+    # Check if statistics file already exists
+    if not os.path.exists(traffic_packets_main_statistics):
+        print(f"Generating traffic_packets_main_statistics: {traffic_packets_main_statistics}")
+        traffic_analysis.main_statistics(capture, traffic_packets_main_statistics)
+    else:
+        print(f"Traffic packets main statistics already exists: {traffic_packets_main_statistics}")
+
+
 
 @click.command()
 @click.option("--input-file", required=True, help="Captured traffic file")
@@ -33,8 +40,8 @@ def main(input_file, traffic_packets_main_statistics,
     print("Capture info:")
     print(capture)
 
-    generate_plots(capture, traffic_graph_output_file, traffic_packets_histogram)
-    traffic_analysis.main_statistics(capture, traffic_packets_main_statistics)
+    generate_plots_and_data(capture, traffic_graph_output_file, traffic_packets_histogram, traffic_packets_main_statistics)
+   
     
     
 if __name__=="__main__":
