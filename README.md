@@ -20,6 +20,14 @@ bash run_analysis_unix.sh
 ```
 This will create a directory `generated` (if the directory doesn't already exist) and write all analysis output files into this directory.
 
+## Run analysis on Windows
+
+In the main directory `tintti-traffic-analysis`, run:
+```
+run_analysis_windows.bat
+```
+This will create a directory `generated` (if the directory doesn't already exist) and write all analysis output files into this directory.
+
 ## Description of generated statistics
 
 ### 5. Graph of traffic as a function of time

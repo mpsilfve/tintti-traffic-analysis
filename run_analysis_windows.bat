@@ -5,4 +5,6 @@ if not exist "generated" mkdir generated
 
 REM Run the Python script
 python src\main.py --input-file data\liikenne.pcapng ^
-                   --traffic-graph-output-file generated\traffic_graph.png
+                   --traffic-packets-main-statistics generated\packets_statistics.txt ^
+                   --traffic-graph-output-file generated\traffic_graph.png ^
+                   --traffic-packets-histogram generated\traffic_packets_histogram.png
