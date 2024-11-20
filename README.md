@@ -1,5 +1,5 @@
 # tintti-traffic-analysis
-
+Luodaan 
 
 ## Create virtual environment myenv
 - `python3 -m venv myenv`
@@ -17,6 +17,14 @@ pip3 install -r requirements.txt
 In the main directory `tintti-traffic-analysis`, run:
 ```
 bash run_analysis_unix.sh
+```
+This will create a directory `generated` (if the directory doesn't already exist) and write all analysis output files into this directory.
+
+## Run analysis on Windows
+
+In the main directory `tintti-traffic-analysis`, run:
+```
+run_analysis_windows.bat
 ```
 This will create a directory `generated` (if the directory doesn't already exist) and write all analysis output files into this directory.
 
