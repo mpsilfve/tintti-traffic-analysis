@@ -97,27 +97,46 @@ def generate_packets_histogram(capture, output_file, bin_width=100):
     print(f"Packet size histogram saved to {output_file}")
 
 
-
-def generate_traffic_graph(capture, output_file):
-    start_time = capture[0].sniff_timestamp
-    packets_per_time = defaultdict(lambda : 0)
-    for packet in capture:
-        time_interval = int(float(packet.sniff_timestamp) - float(start_time))
-        packets_per_time[time_interval] +=1
-        
-    x = [k for k, v in packets_per_time.items()]
-    y = [v for k, v in packets_per_time.items()]
+def plot(x, y, xlabel, ylabel, title, output_file_name):
+    plt.figure(figsize=(10, 6))  # Define figure size for better visualization
     plt.plot(x, y, color='green', linestyle='dashed', linewidth = 2,
              marker='o', markerfacecolor='blue', markersize=5)
 
     # naming the x axis
-    plt.xlabel('Aika sekunneissa')
+    plt.xlabel(xlabel)
+    
     # naming the y axis
-    plt.ylabel('Pakettien lukumäärä')
+    plt.ylabel(ylabel)
     
     # giving a title to my graph
-    plt.title('Kuinka monta pakettia siepattiin sekunnissa seurannan aikana')
+    plt.title(title)
     
     # function to show the plot
-    plt.savefig(output_file)
+    plt.savefig(output_file_name)
         
+def generate_traffic_graph(capture, call_graph_output_file, data_graph_output_file):
+    start_time = capture[0].sniff_timestamp
+    packets_per_time = defaultdict(lambda : 0)
+    data_per_time = defaultdict(lambda : 0)
+    for packet in capture:
+        time_interval = int(float(packet.sniff_timestamp) - float(start_time))
+        packets_per_time[time_interval] +=1
+        data_per_time[time_interval] += int(packet.length)
+        
+    x = [k for k, v in packets_per_time.items()]
+    y_packets = [v for k, v in packets_per_time.items()]
+    y_data = [v for k, v in data_per_time.items()]
+
+    plot(x,
+         y_packets,
+         'Aika sekunneissa',
+         'Pakettien lukumäärä',
+         'Kuinka monta pakettia siepattiin sekunnissa seurannan aikana',
+         call_graph_output_file)
+
+    plot(x,
+         y_data,
+         'Aika sekunneissa',
+         'Lähetetyt tavut',
+         'Kuinka paljon dataa lähetettiin sekunnissa seurannan aikana',
+         data_graph_output_file)
