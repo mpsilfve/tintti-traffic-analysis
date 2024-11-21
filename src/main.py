@@ -4,13 +4,14 @@ import pyshark
 import click
 
 
-def generate_plots_and_data(capture, traffic_graph_output_file,traffic_packets_histogram, traffic_packets_main_statistics):
+def generate_plots_and_data(capture, packet_graph_output_file, data_graph_output_file, traffic_packets_histogram, traffic_packets_main_statistics):
     # Generate graph of traffic as a function of time
-    if not os.path.exists(traffic_graph_output_file):
-        print(f"Generating traffic graph: {traffic_graph_output_file}")
-        traffic_analysis.generate_traffic_graph(capture, traffic_graph_output_file)
+    if not os.path.exists(data_graph_output_file) or not os.path.exists(packet_graph_output_file):
+        print(f"Generating packet graph: {packet_graph_output_file}")
+        print(f"Generating data graph: {data_graph_output_file}")
+        traffic_analysis.generate_traffic_graph(capture, packet_graph_output_file, data_graph_output_file)
     else:
-        print(f"Traffic graph already exists: {traffic_graph_output_file}")
+        print(f"Data and packet graphs already exists: {data_graph_output_file}, {packet_graph_output_file}")
     
     # Check if traffic packets histogram file already exists
     if not os.path.exists(traffic_packets_histogram):
@@ -31,16 +32,20 @@ def generate_plots_and_data(capture, traffic_graph_output_file,traffic_packets_h
 @click.command()
 @click.option("--input-file", required=True, help="Captured traffic file")
 @click.option("--traffic-packets-main-statistics", required=True, help="Store the generated traffic/packet statistics into this file.")
-@click.option("--traffic-graph-output-file", required=True, help="Store the generated traffic/time graph into this file.")
+@click.option("--packet-graph-output-file", required=True, help="Store the generated packets/time graph into this file.")
+@click.option("--data-graph-output-file", required=True, help="Store the generated data/time graph into this file.")
 @click.option("--traffic-packets-histogram", required=True, help="Store the generated traffic/packet histogram graph into this file.")
-def main(input_file, traffic_packets_main_statistics,
-         traffic_graph_output_file, traffic_packets_histogram):
+def main(input_file,
+         traffic_packets_main_statistics,
+         packet_graph_output_file,
+         data_graph_output_file,
+         traffic_packets_histogram):
     print(f"Analyzing file {input_file}")
     capture = pyshark.FileCapture(input_file)
     print("Capture info:")
     print(capture)
 
-    generate_plots_and_data(capture, traffic_graph_output_file, traffic_packets_histogram, traffic_packets_main_statistics)
+    generate_plots_and_data(capture, packet_graph_output_file, data_graph_output_file, traffic_packets_histogram, traffic_packets_main_statistics)
    
     
     
