@@ -1,0 +1,117 @@
+Layer ETH
+:       Destination: 48:df:37:6d:3b:d8
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+        Source: 1c:91:80:d5:c7:17
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+        Type: IPv4 (0x0800)
+        Stream index: 0
+Layer IP
+:       0100 .... = Version: 4
+        .... 0101 = Header Length: 20 bytes (5)
+        Differentiated Services Field: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        0000 00.. = Differentiated Services Codepoint: Default (0)
+        .... ..00 = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+        Total Length: 82
+        Identification: 0xdb42 (56130)
+        000. .... = Flags: 0x0
+        0... .... = Reserved bit: Not set
+        .0.. .... = Don't fragment: Not set
+        ..0. .... = More fragments: Not set
+        ...0 0000 0000 0000 = Fragment Offset: 0
+        Time to Live: 64
+        Protocol: UDP (17)
+        Header Checksum: 0x4a1c [validation disabled]
+        Header checksum status: Unverified
+        Source Address: 10.112.28.219
+        Destination Address: 128.214.173.27
+        Stream index: 0
+Layer UDP
+:       Source Port: 49949
+        Destination Port: 53
+        Length: 62
+        Checksum: 0x0f3d [unverified]
+        Checksum Status: Unverified
+        Stream index: 0
+        Destination Address: 128.214.173.27
+        Stream index: 0
+Layer UDP
+:       Source Port: 49949
+        Destination Port: 53
+        Length: 62
+        Checksum: 0x0f3d [unverified]
+        Checksum Status: Unverified
+        Stream index: 0
+        Destination Port: 53
+        Length: 62
+        Checksum: 0x0f3d [unverified]
+        Checksum Status: Unverified
+        Stream index: 0
+        Checksum: 0x0f3d [unverified]
+        Checksum Status: Unverified
+        Stream index: 0
+        Checksum Status: Unverified
+        Stream index: 0
+        Stream Packet Number: 1
+        Stream index: 0
+        Stream Packet Number: 1
+        Stream Packet Number: 1
+        Timestamps
+        Time since first frame: 0.000000000 seconds
+        Time since previous frame: 0.000000000 seconds
+        UDP payload (54 bytes)
+Layer DNS
+:       Transaction ID: 0xff6c
+        Flags: 0x0100 Standard query
+        0... .... .... .... = Response: Message is a query
+        .000 0... .... .... = Opcode: Standard query (0)
+        .... ..0. .... .... = Truncated: Message is not truncated
+        .... ...1 .... .... = Recursion desired: Do query recursively
+        .... .... .0.. .... = Z: reserved (0)
+        .... .... ...0 .... = Non-authenticated data: Unacceptable
+        Questions: 1
+        Answer RRs: 0
+        Authority RRs: 0
+        Additional RRs: 0
+        Time since previous frame: 0.000000000 seconds
+        UDP payload (54 bytes)
+Layer DNS
+:       Transaction ID: 0xff6c
+        Flags: 0x0100 Standard query
+        0... .... .... .... = Response: Message is a query
+        .000 0... .... .... = Opcode: Standard query (0)
+        .... ..0. .... .... = Truncated: Message is not truncated
+        .... ...1 .... .... = Recursion desired: Do query recursively
+        .... .... .0.. .... = Z: reserved (0)
+        .... .... ...0 .... = Non-authenticated data: Unacceptable
+        Questions: 1
+        Answer RRs: 0
+        Authority RRs: 0
+        Additional RRs: 0
+        .000 0... .... .... = Opcode: Standard query (0)
+        .... ..0. .... .... = Truncated: Message is not truncated
+        .... ...1 .... .... = Recursion desired: Do query recursively
+        .... .... .0.. .... = Z: reserved (0)
+        .... .... ...0 .... = Non-authenticated data: Unacceptable
+        Questions: 1
+        Answer RRs: 0
+        Authority RRs: 0
+        Additional RRs: 0
+        .... .... .0.. .... = Z: reserved (0)
+        .... .... ...0 .... = Non-authenticated data: Unacceptable
+        Questions: 1
+        Answer RRs: 0
+        Authority RRs: 0
+        Additional RRs: 0
+        Answer RRs: 0
+        Authority RRs: 0
+        Additional RRs: 0
+        Additional RRs: 0
+        Queries
+        Name: api.apple-cloudkit.fe2.apple-dns.net
+        Name Length: 36
+        Label Count: 5
+        Type: HTTPS (65) (HTTPS Specific Service Endpoints)
+        Class: IN (0x0001)
+        api.apple-cloudkit.fe2.apple-dns.net: type HTTPS, class IN

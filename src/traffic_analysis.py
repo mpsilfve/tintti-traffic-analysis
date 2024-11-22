@@ -1,6 +1,7 @@
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import Counter
 
 def main_statistics(capture, report_file_path):
     """
@@ -121,3 +122,56 @@ def generate_traffic_graph(capture, output_file):
     # function to show the plot
     plt.savefig(output_file)
         
+
+
+
+
+def protocols_by_layer(capture, report_file_path):
+    PROTOCOL_LAYER_MAPPING = {
+        'eth': 'Data Link Layer',
+        'ip': 'Network Layer',
+        'arp': 'Network Layer',
+        'tcp': 'Transport Layer',
+        'udp': 'Transport Layer',
+        'http': 'Application Layer',
+        'https': 'Application Layer',
+        'dns': 'Application Layer',
+        'tls': 'Application Layer',
+        'icmp': 'Network Layer',
+        'data': 'Application Layer',  # Generic data layer
+        'nbns': 'Application Layer',  # NetBIOS Name Service
+        'quic': 'Application Layer',  # Quick UDP Internet Connections
+        'mdns': 'Application Layer',  # Multicast DNS
+        'ipv6': 'Network Layer'       # IPv6
+    }
+
+    protocol_data = {}
+
+    for packet in capture:
+        for layer in packet.layers:
+            protocol = layer.layer_name.lower()
+            
+            protocol_layer = PROTOCOL_LAYER_MAPPING.get(protocol, 'Unknown Layer')
+            if protocol not in protocol_data:
+                protocol_data[protocol] = {'count': 0, 'layer': protocol_layer}
+
+            protocol_data[protocol]['count'] += 1
+
+    sorted_protocol_data = sorted(
+        protocol_data.items(),
+        key=lambda item: item[1]['layer']  # Sort by the 'layer' field
+    )
+
+    # Print the report
+    print(f"{'Layer':<20}{'Protocol':<20}{'Count':<10}")
+    print("-" * 50)
+    for protocol, data in sorted_protocol_data:
+        print(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}")
+        # Save the report to the specified file
+    with open(report_file_path, "w", encoding="utf-8") as report_file:
+        report_file.write(sorted_protocol_data)
+
+
+    return sorted_protocol_data
+
+
