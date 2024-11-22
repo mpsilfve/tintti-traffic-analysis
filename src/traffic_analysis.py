@@ -1,7 +1,26 @@
 from collections import defaultdict
+from typing import Any, Dict, List
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
+
+PROTOCOL_LAYER_MAPPING = {
+        'eth': 'Data Link Layer',
+        'ip': 'Network Layer',
+        'arp': 'Network Layer',
+        'tcp': 'Transport Layer',
+        'udp': 'Transport Layer',
+        'http': 'Application Layer',
+        'https': 'Application Layer',
+        'dns': 'Application Layer',
+        'tls': 'Application Layer',
+        'icmp': 'Network Layer',
+        'data': 'Application Layer',  # Generic data layer
+        'nbns': 'Application Layer',  # NetBIOS Name Service
+        'quic': 'Application Layer',  # Quick UDP Internet Connections
+        'mdns': 'Application Layer',  # Multicast DNS
+        'ipv6': 'Network Layer'       # IPv6
+    }
 
 def main_statistics(capture, report_file_path):
     """
@@ -122,54 +141,73 @@ def generate_traffic_graph(capture, output_file):
     # function to show the plot
     plt.savefig(output_file)
 
+def protocols_by_layer(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
+    """
+    Analyzes a packet capture and generates a report of protocols by layer.
 
-def protocols_by_layer(capture, report_file_path):
-    PROTOCOL_LAYER_MAPPING = {
-        'eth': 'Data Link Layer',
-        'ip': 'Network Layer',
-        'arp': 'Network Layer',
-        'tcp': 'Transport Layer',
-        'udp': 'Transport Layer',
-        'http': 'Application Layer',
-        'https': 'Application Layer',
-        'dns': 'Application Layer',
-        'tls': 'Application Layer',
-        'icmp': 'Network Layer',
-        'data': 'Application Layer',  # Generic data layer
-        'nbns': 'Application Layer',  # NetBIOS Name Service
-        'quic': 'Application Layer',  # Quick UDP Internet Connections
-        'mdns': 'Application Layer',  # Multicast DNS
-        'ipv6': 'Network Layer'       # IPv6
-    }
+    Args:
+        capture (List[Any]): List of packets with their layers.
+        report_file_path (str): File path to save the generated report.
 
+    Returns:
+        List[Dict[str, Any]]: Sorted protocol data including counts and layers.
+    """
+    protocol_data = _analyze_capture(capture)
+    sorted_protocol_data = _sort_protocol_data(protocol_data)
+    _print_report(sorted_protocol_data)
+    _write_report_to_file(sorted_protocol_data, report_file_path)
+    return sorted_protocol_data
+
+
+def _analyze_capture(capture: List[Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    Processes the packet capture and counts protocols by layer.
+    """
     protocol_data = {}
 
     for packet in capture:
         for layer in packet.layers:
             protocol = layer.layer_name.lower()
-            
             protocol_layer = PROTOCOL_LAYER_MAPPING.get(protocol, 'Unknown Layer')
+
             if protocol not in protocol_data:
                 protocol_data[protocol] = {'count': 0, 'layer': protocol_layer}
 
             protocol_data[protocol]['count'] += 1
 
-    sorted_protocol_data = sorted(
-        protocol_data.items(),
-        key=lambda item: item[1]['layer']  # Sort by the 'layer' field
-    )
+    return protocol_data
 
-    # Print the report
+
+def _sort_protocol_data(protocol_data: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Sorts protocol data by layer name.
+    """
+    return sorted(protocol_data.items(), key=lambda item: item[1]['layer'])
+
+
+def _print_report(sorted_protocol_data: List[Dict[str, Any]]) -> None:
+    """
+    Prints the protocol report to the console.
+    """
     print(f"{'Layer':<20}{'Protocol':<20}{'Count':<10}")
     print("-" * 50)
-    
-    # Save the report to the specified file
-    with open(report_file_path, "w", encoding="utf-8") as report_file:
-        for protocol, data in sorted_protocol_data:
-            line = f"{data['layer']:<20}{protocol:<20}{data['count']:<10}\n"
-            print(line)
-            report_file.write(line)
-
-    return sorted_protocol_data
+    for protocol, data in sorted_protocol_data:
+        print(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}")
 
 
+def _write_report_to_file(sorted_protocol_data: List[Dict[str, Any]], file_path: str) -> None:
+    """
+    Writes the protocol report to a file.
+
+    Args:
+        sorted_protocol_data (List[Dict[str, Any]]): The protocol data to write.
+        file_path (str): The file path to save the report.
+    """
+    try:
+        with open(file_path, "w", encoding="utf-8") as report_file:
+            report_file.write(f"{'Layer':<20}{'Protocol':<20}{'Count':<10}\n")
+            report_file.write("-" * 50 + "\n")
+            for protocol, data in sorted_protocol_data:
+                report_file.write(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}\n")
+    except IOError as e:
+        print(f"Error writing to file {file_path}: {e}")
