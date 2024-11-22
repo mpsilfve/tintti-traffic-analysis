@@ -121,9 +121,6 @@ def generate_traffic_graph(capture, output_file):
     
     # function to show the plot
     plt.savefig(output_file)
-        
-
-
 
 
 def protocols_by_layer(capture, report_file_path):
@@ -165,12 +162,13 @@ def protocols_by_layer(capture, report_file_path):
     # Print the report
     print(f"{'Layer':<20}{'Protocol':<20}{'Count':<10}")
     print("-" * 50)
-    for protocol, data in sorted_protocol_data:
-        print(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}")
-        # Save the report to the specified file
+    
+    # Save the report to the specified file
     with open(report_file_path, "w", encoding="utf-8") as report_file:
-        report_file.write(sorted_protocol_data)
-
+        for protocol, data in sorted_protocol_data:
+            line = f"{data['layer']:<20}{protocol:<20}{data['count']:<10}\n"
+            print(line)
+            report_file.write(line)
 
     return sorted_protocol_data
 
