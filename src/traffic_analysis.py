@@ -1,8 +1,25 @@
 from collections import defaultdict
+from typing import Any, Dict, List
 import matplotlib.pyplot as plt
 import numpy as np
 
-def main_statistics(capture, report_file_path):
+PROTOCOL_LAYER_MAPPING = {
+        'eth': 'Fyysinen kerros',
+        'ip': 'Verkkokerros',
+        'tcp': 'Kuljetuskerros',
+        'udp': 'Kuljetuskerros',
+        'http': 'Sovelluskerros',
+        'https': 'Sovelluskerros',
+        'dns': 'Sovelluskerros',
+        'tls': 'Sovelluskerros',
+        'data': 'Kuljetuskerros',  # Generic data layer
+        'nbns': 'Kuljetuskerros',  # NetBIOS Name Service
+        'quic': 'Kuljetuskerros',  # Quick UDP Internet Connections
+        'mdns': 'Kuljetuskerros',  # Multicast DNS
+        'ipv6': 'Verkkokerros'       # IPv6
+    }
+
+def generate_main_statistics(capture, report_file_path):
     """
     Processes packets from a capture and calculates total packets, total bytes, and time range.
 
@@ -120,4 +137,147 @@ def generate_traffic_graph(capture, output_file):
     
     # function to show the plot
     plt.savefig(output_file)
-        
+
+def generate_protocols_by_layer(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
+    """
+    Analyzes a packet capture and generates a report of protocols by layer.
+
+    Args:
+        capture (List[Any]): List of packets with their layers.
+        report_file_path (str): File path to save the generated report.
+
+    Returns:
+        List[Dict[str, Any]]: Sorted protocol data including counts and layers.
+    """
+    protocol_data = _analyze_capture(capture)
+    sorted_protocol_data = _sort_protocol_data(protocol_data)
+    _print_report(sorted_protocol_data)
+    _write_report_to_file(sorted_protocol_data, report_file_path)
+    
+    return sorted_protocol_data
+
+def generate_protocols_pie_chart(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
+    protocol_data = _analyze_capture_by_highest_layer(capture)
+    sorted_protocol_data = _sort_protocol_data(protocol_data)
+    _generate_pie_chart(sorted_protocol_data, report_file_path)
+
+
+def _analyze_capture_by_highest_layer(capture: List[Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    Processes the packet capture and counts protocols by layer.
+    """
+    protocol_data = {}
+
+    for packet in capture:
+        protocol = packet.highest_layer.lower()
+        protocol_layer = PROTOCOL_LAYER_MAPPING.get(protocol, 'Unknown Layer')
+
+        if protocol not in protocol_data:
+            protocol_data[protocol] = {'count': 0, 'layer': protocol_layer}
+
+        protocol_data[protocol]['count'] += 1
+
+    return protocol_data
+
+def _analyze_capture(capture: List[Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    Processes the packet capture and counts protocols by layer.
+    """
+    protocol_data = {}
+
+    for packet in capture:
+        for layer in packet.layers:
+            protocol = layer.layer_name.lower()
+            protocol_layer = PROTOCOL_LAYER_MAPPING.get(protocol, 'Unknown Layer')
+
+            if protocol not in protocol_data:
+                protocol_data[protocol] = {'count': 0, 'layer': protocol_layer}
+
+            protocol_data[protocol]['count'] += 1
+
+    return protocol_data
+
+
+def _sort_protocol_data(protocol_data: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Sorts protocol data by layer name.
+    """
+    return sorted(protocol_data.items(), key=lambda item: item[1]['layer'])
+
+
+def _print_report(sorted_protocol_data: List[Dict[str, Any]]) -> None:
+    """
+    Prints the protocol report to the console.
+    """
+    print(f"{'Layer':<20}{'Protocol':<20}{'Count':<10}")
+    print("-" * 50)
+    for protocol, data in sorted_protocol_data:
+        print(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}")
+
+
+def _write_report_to_file(sorted_protocol_data: List[Dict[str, Any]], file_path: str) -> None:
+    """
+    Writes the protocol report to a file.
+
+    Args:
+        sorted_protocol_data (List[Dict[str, Any]]): The protocol data to write.
+        file_path (str): The file path to save the report.
+    """
+    try:
+        with open(file_path, "w", encoding="utf-8") as report_file:
+            report_file.write(f"{'Layer':<20}{'Protocol':<20}{'Count':<10}\n")
+            report_file.write("-" * 50 + "\n")
+            for protocol, data in sorted_protocol_data:
+                report_file.write(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}\n")
+    except IOError as e:
+        print(f"Error writing to file {file_path}: {e}")
+
+
+import matplotlib.pyplot as plt
+from typing import List, Dict, Any
+
+def _generate_pie_chart(sorted_protocol_data: List[Dict[str, Any]], file_path: str):
+    layers = {}
+    total_count = 0
+
+    # Accumulate counts per layer
+    for protocol, data in sorted_protocol_data:
+        current_count = int(data['count'])
+        total_count += current_count
+        if data['layer'] in layers:
+            layers[data['layer']] += current_count
+        else:
+            layers[data['layer']] = current_count
+
+    percentages = {layer: (count / total_count) * 100 for layer, count in layers.items()}
+    print("Percentages by layer:", percentages)
+
+    # Define a colorblind-friendly palette with shades of purple and blue
+    color_palette = [
+        "#5A4FCF",  # Medium blue
+        "#7F7FFF",  # Soft blue
+        "#3C3FA4",  # Deep blue
+        "#9F6FFF",  # Light purple
+        "#6B4DB2",  # Dark purple
+        "#847FCF",  # Pale purple
+        "#433D99",  # Royal blue
+    ]
+
+    # Ensure the number of colors matches the number of layers
+    # translate to Finnish 
+
+    labels = list(layers.keys())
+    sizes = list(layers.values())
+    colors = color_palette[:len(labels)]
+
+    # Generate Pie Chart
+    plt.figure(figsize=(8, 8))
+    plt.pie(
+        sizes,
+        labels=labels,
+        colors=colors,
+        autopct='%1.1f%%',
+        startangle=140
+    )
+    plt.title("Protokollien jakautuminen kerroksittain")
+    plt.savefig(file_path)
