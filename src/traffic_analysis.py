@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 PROTOCOL_LAYER_MAPPING = {
-        'eth': 'Linkkikerros',
+        'eth': 'Fyysinen kerros',
         'ip': 'Verkkokerros',
         'tcp': 'Kuljetuskerros',
         'udp': 'Kuljetuskerros',
         'http': 'Sovelluskerros',
         'https': 'Sovelluskerros',
         'dns': 'Sovelluskerros',
-        'tls': 'Istuntokerros',
+        'tls': 'Sovelluskerros',
         'data': 'Kuljetuskerros',  # Generic data layer
         'nbns': 'Kuljetuskerros',  # NetBIOS Name Service
         'quic': 'Kuljetuskerros',  # Quick UDP Internet Connections
@@ -157,9 +157,27 @@ def generate_protocols_by_layer(capture: List[Any], report_file_path: str) -> Li
     return sorted_protocol_data
 
 def generate_protocols_pie_chart(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
-    protocol_data = _analyze_capture(capture)
+    protocol_data = _analyze_capture_by_highest_layer(capture)
     sorted_protocol_data = _sort_protocol_data(protocol_data)
     _generate_pie_chart(sorted_protocol_data, report_file_path)
+
+
+def _analyze_capture_by_highest_layer(capture: List[Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    Processes the packet capture and counts protocols by layer.
+    """
+    protocol_data = {}
+
+    for packet in capture:
+        protocol = packet.highest_layer.lower()
+        protocol_layer = PROTOCOL_LAYER_MAPPING.get(protocol, 'Unknown Layer')
+
+        if protocol not in protocol_data:
+            protocol_data[protocol] = {'count': 0, 'layer': protocol_layer}
+
+        protocol_data[protocol]['count'] += 1
+
+    return protocol_data
 
 def _analyze_capture(capture: List[Any]) -> Dict[str, Dict[str, Any]]:
     """
@@ -263,4 +281,3 @@ def _generate_pie_chart(sorted_protocol_data: List[Dict[str, Any]], file_path: s
     )
     plt.title("Protokollien jakautuminen kerroksittain")
     plt.savefig(file_path)
-    plt.show()
