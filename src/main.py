@@ -4,7 +4,7 @@ import pyshark
 import click
 
 
-def generate_plots_and_data(capture, traffic_graph_output_file,traffic_packets_histogram, traffic_packets_main_statistics, protocol_analysis_report):
+def generate_plots_and_data(capture, traffic_graph_output_file,traffic_packets_histogram, traffic_packets_main_statistics, protocol_analysis_report, protocol_analysis_pie_chart):
     # Generate graph of traffic as a function of time
     if not os.path.exists(traffic_graph_output_file):
         print(f"Generating traffic graph: {traffic_graph_output_file}")
@@ -28,10 +28,17 @@ def generate_plots_and_data(capture, traffic_graph_output_file,traffic_packets_h
 
     # Check if protocol file already exists
     if not os.path.exists(protocol_analysis_report):
-        print(f"Generating traffic_packets_main_statistics: {protocol_analysis_report}")
+        print(f"Generating protocol_analysis_report: {protocol_analysis_report}")
         traffic_analysis.generate_protocols_by_layer(capture, protocol_analysis_report)
     else:
         print(f"Traffic packets main statistics already exists: {protocol_analysis_report}")
+
+    # Check if protocol pie image already exists
+    if not os.path.exists(protocol_analysis_pie_chart):
+        print(f"Generating protocol_analysis_pie_chart: {protocol_analysis_pie_chart}")
+        traffic_analysis.generate_protocols_pie_chart(capture, protocol_analysis_pie_chart)
+    else:
+        print(f"Traffic packets main statistics already exists: {protocol_analysis_pie_chart}")
 
 
 
@@ -49,11 +56,7 @@ def main(input_file, traffic_packets_main_statistics,
     print("Capture info:")
     print(capture)
 
-
-    # todo move to generate_plots_and_data
-    traffic_analysis.generate_protocols_pie_chart(capture, protocol_analysis_pie_chart)
-
-    #generate_plots_and_data(capture, traffic_graph_output_file, traffic_packets_histogram, traffic_packets_main_statistics,  protocol_analysis_report)
+    generate_plots_and_data(capture, traffic_graph_output_file, traffic_packets_histogram, traffic_packets_main_statistics,  protocol_analysis_report, protocol_analysis_pie_chart)
     
     
 if __name__=="__main__":
