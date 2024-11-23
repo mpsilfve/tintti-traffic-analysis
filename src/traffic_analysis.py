@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import Any, Dict, List
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import Counter
 
 PROTOCOL_LAYER_MAPPING = {
         'eth': 'Data Link Layer',
