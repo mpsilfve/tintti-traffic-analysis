@@ -4,24 +4,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 PROTOCOL_LAYER_MAPPING = {
-        'eth': 'Data Link Layer',
-        'ip': 'Network Layer',
-        'arp': 'Network Layer',
-        'tcp': 'Transport Layer',
-        'udp': 'Transport Layer',
-        'http': 'Application Layer',
-        'https': 'Application Layer',
-        'dns': 'Application Layer',
-        'tls': 'Application Layer',
-        'icmp': 'Network Layer',
-        'data': 'Application Layer',  # Generic data layer
-        'nbns': 'Application Layer',  # NetBIOS Name Service
-        'quic': 'Application Layer',  # Quick UDP Internet Connections
-        'mdns': 'Application Layer',  # Multicast DNS
-        'ipv6': 'Network Layer'       # IPv6
+        'eth': 'Linkkikerros',
+        'ip': 'Verkkokerros',
+        'tcp': 'Kuljetuskerros',
+        'udp': 'Kuljetuskerros',
+        'http': 'Sovelluskerros',
+        'https': 'Sovelluskerros',
+        'dns': 'Sovelluskerros',
+        'tls': 'Istuntokerros',
+        'data': 'Kuljetuskerros',  # Generic data layer
+        'nbns': 'Kuljetuskerros',  # NetBIOS Name Service
+        'quic': 'Kuljetuskerros',  # Quick UDP Internet Connections
+        'mdns': 'Kuljetuskerros',  # Multicast DNS
+        'ipv6': 'Verkkokerros'       # IPv6
     }
 
-def main_statistics(capture, report_file_path):
+def generate_main_statistics(capture, report_file_path):
     """
     Processes packets from a capture and calculates total packets, total bytes, and time range.
 
@@ -140,7 +138,7 @@ def generate_traffic_graph(capture, output_file):
     # function to show the plot
     plt.savefig(output_file)
 
-def protocols_by_layer(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
+def generate_protocols_by_layer(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
     """
     Analyzes a packet capture and generates a report of protocols by layer.
 
@@ -155,8 +153,13 @@ def protocols_by_layer(capture: List[Any], report_file_path: str) -> List[Dict[s
     sorted_protocol_data = _sort_protocol_data(protocol_data)
     _print_report(sorted_protocol_data)
     _write_report_to_file(sorted_protocol_data, report_file_path)
+    
     return sorted_protocol_data
 
+def generate_protocols_pie_chart(capture: List[Any], report_file_path: str) -> List[Dict[str, Any]]:
+    protocol_data = _analyze_capture(capture)
+    sorted_protocol_data = _sort_protocol_data(protocol_data)
+    _generate_pie_chart(sorted_protocol_data, report_file_path)
 
 def _analyze_capture(capture: List[Any]) -> Dict[str, Dict[str, Any]]:
     """
@@ -210,3 +213,54 @@ def _write_report_to_file(sorted_protocol_data: List[Dict[str, Any]], file_path:
                 report_file.write(f"{data['layer']:<20}{protocol:<20}{data['count']:<10}\n")
     except IOError as e:
         print(f"Error writing to file {file_path}: {e}")
+
+
+import matplotlib.pyplot as plt
+from typing import List, Dict, Any
+
+def _generate_pie_chart(sorted_protocol_data: List[Dict[str, Any]], file_path: str):
+    layers = {}
+    total_count = 0
+
+    # Accumulate counts per layer
+    for protocol, data in sorted_protocol_data:
+        current_count = int(data['count'])
+        total_count += current_count
+        if data['layer'] in layers:
+            layers[data['layer']] += current_count
+        else:
+            layers[data['layer']] = current_count
+
+    percentages = {layer: (count / total_count) * 100 for layer, count in layers.items()}
+    print("Percentages by layer:", percentages)
+
+    # Define a colorblind-friendly palette with shades of purple and blue
+    color_palette = [
+        "#5A4FCF",  # Medium blue
+        "#7F7FFF",  # Soft blue
+        "#3C3FA4",  # Deep blue
+        "#9F6FFF",  # Light purple
+        "#6B4DB2",  # Dark purple
+        "#847FCF",  # Pale purple
+        "#433D99",  # Royal blue
+    ]
+
+    # Ensure the number of colors matches the number of layers
+    # translate to Finnish 
+
+    labels = list(layers.keys())
+    sizes = list(layers.values())
+    colors = color_palette[:len(labels)]
+
+    # Generate Pie Chart
+    plt.figure(figsize=(8, 8))
+    plt.pie(
+        sizes,
+        labels=labels,
+        colors=colors,
+        autopct='%1.1f%%',
+        startangle=140
+    )
+    plt.title("Protokollien jakautuminen kerroksittain")
+    plt.savefig(file_path)
+    plt.show()
